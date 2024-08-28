@@ -1,8 +1,13 @@
-import { Flex } from "@radix-ui/themes";
+import { Flex, Grid } from "@radix-ui/themes";
 import { Metadata } from 'next'
+import LatestEvents from "./LatestEvents";
 
 export default function Home() {
-  return <Flex>Hubble</Flex>;
+  return (
+    <Grid>
+      <LatestEvents />
+    </Grid>
+  );
 }
 
 export const metadata: Metadata = {

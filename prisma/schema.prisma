@@ -21,7 +21,7 @@ model Event {
   containerAlias String
   containerId    String
   containerType  String
-  data           String   @db.Text
+  data           Json
   eventTime      DateTime
   createdAt      DateTime @default(now())
 
