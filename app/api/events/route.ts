@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     // Parse the parameters, providing defaults if they are null or cannot be parsed to an integer
     const skip = skipParam ? parseInt(skipParam) : 0 // Default to 0 if not provided
-    const take = takeParam ? parseInt(takeParam) : 10 // Default to 10 if not provided
+    const take = takeParam ? parseInt(takeParam) : 5 // Default to 5 if not provided
 
     try {
         // Fetch events with pagination using 'skip' and 'take' values
