@@ -12,7 +12,7 @@ const NavBar = () => {
                 <Flex justify="between">
                     <Flex align="center" gap="3">
                         <Link href="/">
-                            <SiPlanetscale size="2rem" />
+                            <SiPlanetscale color='var(--sky-9)' size="2rem" />
                         </Link>
                         <NavLinks />
                     </Flex>
