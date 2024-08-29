@@ -7,7 +7,7 @@ CREATE TABLE `Event` (
     `containerAlias` VARCHAR(191) NOT NULL,
     `containerId` VARCHAR(191) NOT NULL,
     `containerType` VARCHAR(191) NOT NULL,
-    `data` TEXT NOT NULL,
+    `data` JSON NOT NULL,
     `eventTime` DATETIME(3) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 

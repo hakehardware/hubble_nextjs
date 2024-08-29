@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   hubble-app:
     build:
@@ -7,3 +5,11 @@ services:
       dockerfile: dockerfile
     ports:
       - "9955:3000"
+    networks:
+      spaceport-network:
+        ipv4_address: 172.99.0.100
+    command: sh -c "npx prisma migrate deploy && node server.js"
+
+networks:
+  spaceport-network:
+    external: true
