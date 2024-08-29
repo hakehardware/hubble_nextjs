@@ -6,17 +6,63 @@ export async function GET(request: NextRequest) {
     // Extract search parameters from the request URL
     const { searchParams } = new URL(request.url)
 
-    // Get 'skip' and 'take' parameters, providing default values if they are null
+    // Pagination parameters
     const skipParam = searchParams.get('skip')
     const takeParam = searchParams.get('take')
+    const skip = skipParam ? parseInt(skipParam) : 0
+    const take = takeParam ? parseInt(takeParam) : 5
 
-    // Parse the parameters, providing defaults if they are null or cannot be parsed to an integer
-    const skip = skipParam ? parseInt(skipParam) : 0 // Default to 0 if not provided
-    const take = takeParam ? parseInt(takeParam) : 5 // Default to 5 if not provided
+    // Filtering parameters
+    const name = searchParams.get('name')
+    const type = searchParams.get('type')
+    const level = searchParams.get('level')
+    const containerAlias = searchParams.get('containerAlias')
+    const containerId = searchParams.get('containerId')
+    const containerType = searchParams.get('containerType')
+    const startDate = searchParams.get('startDate')
+    const endDate = searchParams.get('endDate')
+    
+    // Construct the 'where' filter object
+    const where: any = {}
 
+    if (name) {
+        where.name = name
+    }
+
+    if (type) {
+        where.type = type
+    }
+
+    if (level && ['INFO', 'WARN', 'ERROR'].includes(level)) {
+        where.level = level
+    }
+
+    if (containerAlias) {
+        where.containerAlias = containerAlias
+    }
+
+    if (containerId) {
+        where.containerId = containerId
+    }
+
+    if (containerType) {
+        where.containerType = containerType
+    }
+
+    // Add date filtering for eventTime
+    if (startDate || endDate) {
+        where.eventTime = {}
+        if (startDate) {
+            where.eventTime.gte = new Date(startDate) // Filter events from startDate onwards
+        }
+        if (endDate) {
+            where.eventTime.lte = new Date(endDate) // Filter events up to endDate
+        }
+    }
     try {
         // Fetch events with pagination using 'skip' and 'take' values
         const events = await prisma.event.findMany({
+            where,
             orderBy: { eventTime: 'desc' },
             skip, // Skip the number of records as specified
             take, // Limit the number of records as specified
@@ -41,6 +87,27 @@ export async function POST(request: NextRequest) {
             return NextResponse.json(validation.error.format(), {
                 status: 400,
             })
+
+        // Check for existing event with the same eventTime and data
+        const existingEvent = await prisma.event.findFirst({
+            where: {
+                eventTime: validation.data.eventTime,
+                data: {
+                    equals: validation.data.data, // Use a nested object for JSON fields
+                },
+            },
+        })
+
+        if (existingEvent) {
+            return NextResponse.json(
+                {
+                    error: 'Duplicate event detected',
+                    details:
+                        'An event with the same eventTime and data already exists.',
+                },
+                { status: 409 } // 409 Conflict
+            )
+        }
 
         const newEvent = await prisma.event.create({
             data: validation.data,

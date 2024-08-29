@@ -4,25 +4,42 @@ import classnames from 'classnames'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { SiPlanetscale } from 'react-icons/si'
+import { useState } from 'react'
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@radix-ui/react-collapsible'
+import { FiMenu } from 'react-icons/fi'
 
 const NavBar = () => {
+    const [isOpen, setIsOpen] = useState(false)
+
     return (
-        <nav className=" border-b mb-5 px-5 py-3">
+        <nav className="border-b mb-5 px-5 py-3">
             <Container>
-                <Flex justify="between">
-                    <Flex align="center" gap="3">
+                <div className="hidden md:block">
+                    <Flex align="center" gap="5">
                         <Link href="/">
-                            <SiPlanetscale color='var(--sky-9)' size="2rem" />
+                            <SiPlanetscale color="var(--sky-9)" size="2rem" />
                         </Link>
                         <NavLinks />
                     </Flex>
-                </Flex>
+                </div>
+                <div className="md:hidden">
+                    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+                        <CollapsibleTrigger asChild>
+                            <button className="p-2">
+                                <FiMenu size="1.5rem" aria-label="Toggle Menu" />
+                            </button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                            <NavLinks direction="vertical" />
+                        </CollapsibleContent>
+                    </Collapsible>
+                </div>
             </Container>
         </nav>
     )
 }
 
-const NavLinks = () => {
+const NavLinks = ({ direction = 'horizontal' }) => {
     const currentPath = usePathname()
 
     const links = [
@@ -34,7 +51,7 @@ const NavLinks = () => {
     ]
 
     return (
-        <ul className="flex space-x-6">
+        <ul className={`flex ${direction === 'vertical' ? 'flex-col space-y-4' : 'space-x-6'}`}>
             {links.map((link) => (
                 <li key={link.label}>
                     <Link

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import {
     Box,
     Card,
+    Container,
     Flex,
     Heading,
     Progress,
@@ -68,13 +69,13 @@ const LatestEvents = () => {
     const progressValue = ((10 - countdown) / 10) * 100
 
     return (
-        <Card>
+        <Box className='px-5'>
             <Flex justify="between">
                 <Heading size="4" mb="5">
                     Latest Events
                 </Heading>
                 <Flex direction="column" gap="2">
-                    <Text size="2">Refreshes In: {countdown}</Text>
+                    <Text size="1">Refreshes In: {countdown}</Text>
                     <Box maxWidth="100px">
                         <Progress value={progressValue} />
                     </Box>
@@ -87,13 +88,12 @@ const LatestEvents = () => {
                         <Table.Row key={event.id}>
                             <Table.Cell>
                                 <Flex align="center" gap="5">
-                                    <EntityIcon entity={event.containerType} />
                                     <Flex
                                         direction="column"
                                         align="start"
                                         gap="1"
                                     >
-                                        <Flex gap="4">
+                                        <Flex align="center" gap="4">
                                             <NewEventBadge
                                                 dateString={event.eventTime}
                                             />
@@ -126,7 +126,7 @@ const LatestEvents = () => {
                     ))}
                 </Table.Body>
             </Table.Root>
-        </Card>
+        </Box>
     )
 }
 
