@@ -21,7 +21,6 @@ docker network create \
 
 Then simply run deploy the Cosmos and MySQL containers:
 ```yml
-version: "3.8"
 services:
   cosmos:
     container_name: spaceport-cosmos
