@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Spaceport Cosmos
+Spaceport Cosmos is the API & Front End for Spaceport. 
 
-## Getting Started
+### Installation
+The best way to install Cosmos is to use the dockerhub image:
+[Cosmos](https://hub.docker.com/r/hakehardware/spaceport-cosmos)
 
-First, run the development server:
+More indepth instructions can be found on my SubStack here:
+[Spaceport Guide](https://hakedev.substack.com/p/spaceport-guide)
 
+#### Abbreviated Instructions
+
+Setup the Network:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker network create \
+  --driver bridge \
+  --subnet 172.99.0.0/16 \
+  --gateway 172.99.0.1 \
+  spaceport-network
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then simply run deploy the Cosmos and MySQL containers:
+```yml
+version: "3.8"
+services:
+  cosmos:
+    container_name: spaceport-cosmos
+    image: hakehardware/spaceport-cosmos:0.0.2
+    restart: unless-stopped
+    ports:
+      - "9955:3000"
+    environment:
+      - TZ=America/Phoenix
+    networks:
+      spaceport-network:
+        ipv4_address: 172.99.0.100
+    command: sh -c "npx prisma migrate deploy && node server.js"
+    depends_on:
+      mysql:
+        condition: service_healthy
+        
+  mysql:
+    container_name: spaceport-mysql
+    image: mysql:8.0
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: spaceport
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      spaceport-network:
+        ipv4_address: 172.99.0.101
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root --password=password || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+volumes:
+  mysql_data:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+networks:
+  spaceport-network:
+    external: true
+```
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+### Advanced Installation
+Some users may want to build the image themselves. This is useful if you want to update the MySQL URL with a custom endpoint and username/password, or you want to make some changes to the website.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Both a docker-compose.yml and dockerfile are included in the repo for this purpose.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+#### Changing the MySQL username/password
+The MySQL URL is located in the .env file in the root directory. This .env is used when building the image to pull in the MySQL URL which contains the username/password.
 
-## Deploy on Vercel
+The default is: 
+DATABASE_URL="mysql://root:password@172.99.0.101:3306/spaceport"
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+You can update the username, password, and IP for your MySQL instance to whatever you want here, and then make sure that you also update the docker-compose to use those same values. For example if you want to change 'password' to 'abc123' and update the URL to '192.168.1.11' then your URL would be:
+DATABASE_URL="mysql://root:abc123@192.168.1.11:3306/spaceport"
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+Your MySQL container would look like:
+
+```yml
+  mysql:
+    container_name: spaceport-mysql
+    image: mysql:8.0
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: abc123
+      MYSQL_DATABASE: spaceport
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root --password=abc123 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  mysql_data:
+```
+
+NOTE: Make sure to also update the healthcheck username/password if you change them.
+
+Now build your image:
+```bash
+docker build -t custom-cosmos-build .
+```
+
+Now in Portainer, or your docker-compose, you could reference the image as "custom-cosmos-build". 
