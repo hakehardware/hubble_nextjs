@@ -5,7 +5,7 @@ Spaceport Cosmos is the API & Front End for Spaceport.
 The best way to install Cosmos is to use the dockerhub image:
 [Cosmos](https://hub.docker.com/r/hakehardware/spaceport-cosmos)
 
-More indepth instructions can be found on my SubStack here:
+More indepth instructions which include installation of Hubble can be found on my Substack here:
 [Spaceport Guide](https://hakedev.substack.com/p/spaceport-guide)
 
 #### Abbreviated Instructions
@@ -73,7 +73,7 @@ networks:
 ### Advanced Installation
 Some users may want to build the image themselves. This is useful if you want to update the MySQL URL with a custom endpoint and username/password, or you want to make some changes to the website.
 
-Both a docker-compose.yml and dockerfile are included in the repo for this purpose.
+A dockerfile is included in the repo for this purpose.
 
 #### Changing the MySQL username/password
 The MySQL URL is located in the .env file in the root directory. This .env is used when building the image to pull in the MySQL URL which contains the username/password.
