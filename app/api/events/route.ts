@@ -95,6 +95,7 @@ export async function POST(request: NextRequest) {
                 data: {
                     equals: validation.data.data, // Use a nested object for JSON fields
                 },
+                containerId: validation.data.containerId
             },
         })
 
