@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
                 {
                     error: 'Duplicate event detected',
                     details:
-                        'An event with the same eventTime and data already exists.',
+                        `An event with the same eventTime and data already exists for ${validation.data.name}`,
                 },
                 { status: 409 } // 409 Conflict
             )

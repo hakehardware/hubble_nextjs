@@ -37,14 +37,32 @@ enum Level {
 
 model Container {
   id  String @unique
-  type String
+  type ContainerType
   alias String
   status String
   image String
   startedAt DateTime
-  isCluster Boolean
-  natsUrl String
   ip String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum ContainerType {
+  CLUSTER_PLOTTER
+  CLUSTER_FARMER
+  CLUSTER_CACHE
+  CLUSTER_CONTROLLER
+  FARMER
+  NODE
+  NATS
+}
+
+enum ContainerStatus {
+  CREATED
+  RESTARTING
+  RUNNING
+  REMOVING
+  PAUSED
+  EXITED
+  DEAD
 }
