@@ -2,8 +2,6 @@
 import React, { useEffect, useState } from 'react'
 import {
     Box,
-    Card,
-    Container,
     Flex,
     Heading,
     Progress,
@@ -16,11 +14,6 @@ import { Event } from '@prisma/client'
 import NewEventBadge from './components/NewEventBadge'
 
 const LatestEvents = () => {
-    // const events = await prisma.event.findMany({
-    //     take: 10,
-    //     orderBy: { eventTime: 'desc' },
-    // })
-
     const [events, setEvents] = useState<Event[]>([])
     const [lastUpdated, setLastUpdated] = useState<string>('')
     const [countdown, setCountdown] = useState<number>(10) // State for countdown
@@ -69,7 +62,7 @@ const LatestEvents = () => {
     const progressValue = ((10 - countdown) / 10) * 100
 
     return (
-        <Box className='px-5'>
+        <Box className="p-5 md:pr-5">
             <Flex justify="between">
                 <Heading size="4" mb="5">
                     Latest Events
@@ -102,6 +95,10 @@ const LatestEvents = () => {
                                             </Text>
                                         </Flex>
 
+                                        <DateBadge
+                                            dateString={event.eventTime}
+                                        />
+
                                         <Text>{event.containerAlias}</Text>
                                         <pre
                                             style={{
@@ -110,15 +107,11 @@ const LatestEvents = () => {
                                                 background: '#f6f8fa',
                                                 padding: '5px',
                                                 borderRadius: '5px',
-                                                fontSize: "0.8rem"
+                                                fontSize: '0.8rem',
                                             }}
                                         >
                                             {JSON.stringify(event.data)}
                                         </pre>
-
-                                        <DateBadge
-                                            dateString={event.eventTime}
-                                        />
                                     </Flex>
                                 </Flex>
                             </Table.Cell>
