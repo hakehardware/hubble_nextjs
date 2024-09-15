@@ -24,7 +24,7 @@ Then simply run deploy the Cosmos and MySQL containers:
 services:
   cosmos:
     container_name: spaceport-cosmos
-    image: hakehardware/spaceport-cosmos:0.0.2-hotfix
+    image: hakehardware/spaceport-cosmos:0.0.3
     restart: unless-stopped
     ports:
       - "9955:3000"
