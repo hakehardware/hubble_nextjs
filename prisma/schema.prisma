@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
@@ -20,11 +20,13 @@ model Event {
   type           String
   level          Level
   containerAlias String
-  containerId    String
+  containerId    String   @unique
   containerType  String
   data           Json
   eventTime      DateTime
   createdAt      DateTime @default(now())
+
+  container Container @relation("ContainerToEvent", fields: [containerId], references: [id])
 
   @@index([eventTime])
 }
@@ -36,15 +38,24 @@ enum Level {
 }
 
 model Container {
-  id  String @unique
-  type ContainerType
-  alias String
-  status String
-  image String
+  id        String        @unique
+  type      ContainerType
+  alias     String
+  status    String
+  image     String
   startedAt DateTime
-  ip String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  ip        String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  node              Node?              @relation("ContainerToNode")
+  farmer            Farmer?            @relation("ContainerToFarmer")
+  clusterController ClusterController? @relation("ContainerToClusterController")
+  clusterCache      ClusterCache?      @relation("ContainerToClusterCache")
+  clusterFarmer     ClusterFarmer?     @relation("ContainerToClusterFarmer")
+  clusterPlotter    ClusterPlotter?    @relation("ContainerToClusterPlotter")
+  event             Event?             @relation("ContainerToEvent")
+  nats              Nats?              @relation("ContainerToNats")
 }
 
 enum ContainerType {
@@ -65,4 +76,53 @@ enum ContainerStatus {
   PAUSED
   EXITED
   DEAD
+}
+
+model Node {
+  containerId String    @id @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  container   Container @relation("ContainerToNode", fields: [containerId], references: [id], onDelete: Cascade)
+}
+
+model Farmer {
+  containerId String    @id @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  container   Container @relation("ContainerToFarmer", fields: [containerId], references: [id], onDelete: Cascade)
+}
+
+model ClusterController {
+  containerId String    @id @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  container   Container @relation("ContainerToClusterController", fields: [containerId], references: [id], onDelete: Cascade)
+}
+
+model ClusterCache {
+  containerId String    @id @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  container   Container @relation("ContainerToClusterCache", fields: [containerId], references: [id], onDelete: Cascade)
+}
+
+model ClusterFarmer {
+  containerId String    @id @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  container   Container @relation("ContainerToClusterFarmer", fields: [containerId], references: [id], onDelete: Cascade)
+}
+
+model ClusterPlotter {
+  containerId String    @id @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  container   Container @relation("ContainerToClusterPlotter", fields: [containerId], references: [id], onDelete: Cascade)
+}
+
+model Nats {
+  containerId String    @id @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  container   Container @relation("ContainerToNats", fields: [containerId], references: [id], onDelete: Cascade)
 }
